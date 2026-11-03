@@ -276,6 +276,8 @@ cdk bootstrap aws://<account-id>/us-east-1 \
   --cloudformation-execution-policies arn:aws:iam::<account-id>:policy/<deployment-policy-name>
 ```
 
+> `cdk bootstrap` runs the CDK app, so `instance_alias` must already be set. If you pass it on the command line instead of editing `cdk.json`, pass it to `cdk bootstrap` as well, for example `cdk bootstrap aws://<account-id>/us-east-1 -c instance_alias=acme-contact-center`.
+
 **Expected result:** the last line is `✅  Environment aws://<account-id>/us-east-1 bootstrapped.`. If the account and Region were bootstrapped before, you see `(no changes)`, which is also a success.
 
 ### 6.3 Pre-deployment check (recommended)

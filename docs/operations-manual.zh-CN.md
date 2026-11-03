@@ -276,6 +276,8 @@ cdk bootstrap aws://<账号ID>/us-east-1 \
   --cloudformation-execution-policies arn:aws:iam::<账号ID>:policy/<部署策略名称>
 ```
 
+> `cdk bootstrap` 会运行 CDK 应用，因此执行前须已设置 `instance_alias`。如果通过命令行参数而非修改 `cdk.json` 指定别名，`cdk bootstrap` 也需带上该参数，例如 `cdk bootstrap aws://<账号ID>/us-east-1 -c instance_alias=acme-contact-center`。
+
 **预期结果：** 最后一行为 `✅  Environment aws://<账号ID>/us-east-1 bootstrapped.`。如果该账号区域之前已初始化过，会显示 `(no changes)`，同样表示成功。
 
 ### 6.3 部署前检查（推荐）
