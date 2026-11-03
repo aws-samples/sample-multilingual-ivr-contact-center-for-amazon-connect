@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# CDK
+cdk/cdk.out/
+cdk.out/
+*.d.ts
+
+# Node
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Local / OS
+.DS_Store
+*.log
+.env
+*.zip
+docs/*-preview.png
+docs/README-preview.html
+
+# Account-specific files generated during deployment (contain account IDs; never commit)
+deploy/env.sh
+flows/_vmx_reference/
+flows/ivr-main.vmx.json
+flows/_backup_*.json
