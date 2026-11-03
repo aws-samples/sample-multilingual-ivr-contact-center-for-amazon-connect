@@ -155,7 +155,7 @@ VMX 默认通过"联系人记录 → Kinesis → `RecordingProcessor`"触发处�
 - **数据访问控制：** 工单基于标签实施按座席隔离，座席仅可访问本人及共享池中的工单。
 - **合规告知与数据保留：** 呼入流程开始时通过 TTS 告知通话录音；S3 对象 7 年后自动过期删除。
 - **屏幕录制：** 屏幕录制不支持 macOS（仅支持 Windows / ChromeOS 及客户端应用程序），本项目未启用。
-- **删除策略：** S3、KMS、Kinesis 资源的删除策略为 `DESTROY`（S3 启用 `auto_delete_objects`），执行 `cdk destroy` 会同时删除数据；生产环境应改为 `RETAIN`。
+- **删除策略：** S3、KMS、Kinesis 资源的删除策略为 `DESTROY`（S3 启用 `auto_delete_objects`），执行 `cdk destroy` 会同时删除数据；VMX 的录音与转写存储桶由自定义资源在删除 VMX 堆栈前清空。生产环境应改为 `RETAIN`。
 
 ---
 

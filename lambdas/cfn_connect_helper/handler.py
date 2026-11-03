@@ -11,6 +11,10 @@ Operations (ResourceProperties.Operation):
   8 kHz 16-bit mono PCM WAV, as required by Amazon Connect prompts) and upload it to S3.
     Properties: Bucket, Key
     Data:       {S3Uri}
+- EmptyBuckets: on stack deletion, delete every object (and object version) in the given
+  buckets so CloudFormation can delete them. Used for the VMX buckets, which the VMX
+  template creates without automatic object deletion.
+    Properties: Buckets [bucket name, ...]
 
 Invoked through the CDK Provider framework: return a dict with PhysicalResourceId and Data.
 """
@@ -81,12 +85,31 @@ def _ringback_prompt(props):
     return uri, {"S3Uri": uri}
 
 
-OPERATIONS = {"LookupFlows": _lookup_flows, "RingbackPrompt": _ringback_prompt}
+def _empty_bucket(bucket):
+    paginator = s3.get_paginator("list_object_versions")
+    try:
+        for page in paginator.paginate(Bucket=bucket):
+            keys = [{"Key": v["Key"], "VersionId": v["VersionId"]}
+                    for v in page.get("Versions", []) + page.get("DeleteMarkers", [])]
+            for i in range(0, len(keys), 1000):
+                s3.delete_objects(Bucket=bucket, Delete={"Objects": keys[i:i + 1000], "Quiet": True})
+    except s3.exceptions.NoSuchBucket:
+        pass
+
+
+def _empty_buckets(props):
+    return "empty-buckets", {}
+
+
+OPERATIONS = {"LookupFlows": _lookup_flows, "RingbackPrompt": _ringback_prompt, "EmptyBuckets": _empty_buckets}
 
 
 def handler(event, context):
     props = event["ResourceProperties"]
     if event["RequestType"] == "Delete":
+        if props.get("Operation") == "EmptyBuckets":
+            for bucket in props.get("Buckets", []):
+                _empty_bucket(bucket)
         # Lookups own nothing; the prompt object is removed with its bucket.
         return {"PhysicalResourceId": event["PhysicalResourceId"]}
     physical_id, data = OPERATIONS[props["Operation"]](props)

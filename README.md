@@ -155,7 +155,7 @@ The prompt voice is set in the `UpdateContactTextToSpeechVoice` block of `ivr-ma
 - **Data access control:** Cases are isolated per agent with tags; an agent can access only their own cases and the shared pool.
 - **Recording notice and retention:** The inbound flow announces call recording at the start; S3 objects expire after 7 years.
 - **Screen recording:** Screen recording is not supported on macOS (only Windows, ChromeOS and the client application), so this sample does not enable it.
-- **Removal policy:** The S3, KMS and Kinesis resources use the `DESTROY` removal policy (S3 with `auto_delete_objects`), so `cdk destroy` also deletes the data. Use `RETAIN` in production.
+- **Removal policy:** The S3, KMS and Kinesis resources use the `DESTROY` removal policy (S3 with `auto_delete_objects`), so `cdk destroy` also deletes the data; the VMX recordings and transcripts buckets are emptied by a custom resource before the VMX stack is deleted. Use `RETAIN` in production.
 
 ---
 
