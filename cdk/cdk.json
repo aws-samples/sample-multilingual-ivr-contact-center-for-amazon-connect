@@ -1,0 +1,46 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "@aws-cdk/core:newStyleStackSynthesis": true,
+    "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": true,
+    "instance_alias": "<unique-instance-alias>",
+    "stack_name": "ConnectIvrStack",
+    "region": "us-east-1",
+    "agents": [
+      {
+        "username": "agent1",
+        "first_name": "Agent",
+        "last_name": "One"
+      },
+      {
+        "username": "agent2",
+        "first_name": "Agent",
+        "last_name": "Two"
+      },
+      {
+        "username": "agent3",
+        "first_name": "Agent",
+        "last_name": "Three"
+      }
+    ],
+    "supervisor": {
+      "username": "supervisor",
+      "first_name": "Supervisor",
+      "last_name": "Lead"
+    },
+    "claim_phone_number": true,
+    "phone_country_code": "US",
+    "owner_wait_seconds": 20,
+    "cases_labels": {
+      "ticket_field": "工单号",
+      "transcript_field": "留言转写",
+      "layout": "标准工单布局",
+      "summary_section": "概要",
+      "details_section": "更多信息",
+      "standard_template": "标准工单",
+      "voicemail_template": "语音留言工单",
+      "agent_template_prefix": "工单-"
+    },
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false
+  }
+}
