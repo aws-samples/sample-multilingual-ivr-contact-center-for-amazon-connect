@@ -540,6 +540,17 @@ class ConnectIvrStack(Stack):
                                Modules={"CoreModule": "VMX3_Main_VM_Module_" + alias})
         vmx_ids.node.add_dependency(vmx)
 
+        # The VMX template does not empty its buckets on deletion; empty them first so cdk destroy succeeds.
+        vmx_buckets = ["vmx3-recordings-" + alias, "vmx3-transcripts-" + alias]
+        helper_fn.add_to_role_policy(iam.PolicyStatement(
+            actions=["s3:ListBucket", "s3:ListBucketVersions"],
+            resources=["arn:aws:s3:::%s" % b for b in vmx_buckets]))
+        helper_fn.add_to_role_policy(iam.PolicyStatement(
+            actions=["s3:DeleteObject", "s3:DeleteObjectVersion"],
+            resources=["arn:aws:s3:::%s/*" % b for b in vmx_buckets]))
+        vmx_cleanup = self._helper(provider, "VmxBucketCleanup", Operation="EmptyBuckets", Buckets=vmx_buckets)
+        vmx_cleanup.node.add_dependency(vmx)
+
         # ================= Contact flows =================
         base = {"REGION": self.region, "ACCOUNT_ID": self.account, "INSTANCE_ID": inst_id}
         whisper = connect.CfnContactFlow(
@@ -634,7 +645,11 @@ class ConnectIvrStack(Stack):
             "Resource::<MediaBucketBCBB02BA.Arn>/transcripts/*":
                 "Call transcripts are written under the transcripts/ prefix only.",
             "Resource::arn:aws:s3:::vmx3-transcripts-%s/*" % self.node.try_get_context("instance_alias"):
-                "Reads voicemail transcripts written by VMX; object keys are known only when the event arrives.",
+                "Reads voicemail transcripts written by VMX; object keys are known only when the event arrives. The "
+                "deployment helper also empties this bucket on stack deletion.",
+            "Resource::arn:aws:s3:::vmx3-recordings-%s/*" % self.node.try_get_context("instance_alias"):
+                "The deployment helper empties the VMX recordings bucket on stack deletion so CloudFormation can "
+                "delete it; scoped to this stack's VMX bucket.",
             "Resource::*":
                 "Actions without resource-level permissions: transcribe:StartTranscriptionJob, "
                 "lambda:ListEventSourceMappings, logs:PutRetentionPolicy, and the EventBridge / service-linked role "
